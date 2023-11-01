@@ -1,27 +1,16 @@
-const compareString = (comparedLine, maxLength) => comparedLine.length <= maxLength;
-
-compareString('ss', 1)
-
-const isPolindrom = (line) => {
-line = line.replaceAll(' ','').toLowerCase();
-
-return line === [...line].reverse().join('');
-
+const convertTimeToMinutes = (time) => {
+  const [hours, minutes] = time.split(':').map((element) = parseInt (element, 10));
+  return hours * 60 + minutes;
 };
 
-isPolindrom('bobs');
+  const checkworkingSchedule = (dayStart, dayEnd, meetingStart, meetingDuration) => {
+    dayStart = convertTimeToMinutes (dayStart);
+    dayEnd = convertTimeToMinutes (dayEnd);
+    meetingStart = convertTimeToMinutes(meetingStart);
 
-const findNumber= (line) => {
-  let result = '';
-  line = line.toString();
-
-  for(let i = 0; 1 < line.length; i++) {
-    const currentSymbol = parseInt(line[i], 10);
-    if(!isNaN(currentSymbol)){
-      result += currentSymbol;
+    if (meetingStart >= dayStart) {
+      return (meetingStart + meetingDuration) <= dayEnd;
     }
-  }
-  return parseInt (result, 10);
-};
 
-findNumber('s!2');
+      return false;
+  };
