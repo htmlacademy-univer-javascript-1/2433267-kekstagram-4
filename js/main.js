@@ -1,24 +1,4 @@
-const DESCRIPTIONS = [
-  'Романтический закат',
-  'Отражение цветов',
-  'Красота природы',
-  'Горы и море',
-  'Момент наслаждения',
-  'Солнечные лучи',
-  'Волшебный пейзаж',
-  'Берег и облака',
-  'Одинокий человек',
-  'Встреча с природой'
-  ];
-
-const NAMES = [
-  'Анна',
-  'Дмитрий',
-  'Елена',
-  'Иван',
-  'Катерина',
-  'Максим',
-  ];
+import {getRandomNumberFromInterval, shuffle} from './utils.js';
 
 const MESSAGES = [
   'Всё отлично!',
@@ -26,42 +6,63 @@ const MESSAGES = [
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
   'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
-  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
-  ];
+  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!',
+];
 
-const COUNT_PHOTO = 25;
-const COMMENTS_MAX = 30;
+const NAMES = ['Александр', 'Дмитрий', 'Максим', 'Сергей', 'Андрей', 'Алексей',
+  'Екатерина','Арина', 'Полина', 'Ольга', 'Юлия', 'Татьяна'];
 
-  const Likes = {
-  MIN:15,
-  MAX:200
-  };
+const DESCRIPTIONS = ['Восторг!', 'Шедевр', 'Поставлю в рамочку', 'Необычный объект', 'Практически НЛО',
+  'Что это вообще??', 'Нет слов', 'Описание съел Кекс', 'Возможно, это скульптура', 'Просто фото'];
 
-  const getRandomInteger = (a, b) => {
-    const lower = Math.ceil(Math.min(a, b));
-    const upper = Math.floor(Math.max(a, b));
-    const result = Math.random() * (upper - lower + 1) + lower;
-    return Math.floor(result);
-  };
+const CommentsCount = {
+  MIN: 0,
+  MAX: 30,
+};
 
-  const addComments = () => ({
-    id: getRandomInteger(0, COUNT_PHOTO),
-    avatar: `img/avatar-${getRandomInteger(1, 6)}.svg`,
-    message: MESSAGES[getRandomInteger(0, MESSAGES.length -1)],
-    name: NAMES[getRandomInteger(0, NAMES.length - 1)]
-  });
+const LikesCount = {
+  MIN: 15,
+  MAX: 200,
+};
 
-  const addPhoto = () =>({
-     id: getRandomInteger(1, COUNT_PHOTO),
-     url: `photos/${getRandomInteger(1, COUNT_PHOTO)}.jpg`,
-     description: DESCRIPTIONS[getRandomInteger(0, DESCRIPTIONS.length - 1)],
-     likes: getRandomInteger(Likes.MIN, Likes.MAX),
-     comments: Array.from(getRandomInteger(0 , COMMENTS_MAX), addComments)
-  });
+const MessagesCount = {
+  MIN: 1,
+  MAX: 2,
+};
 
-  const getPhoto = () => {
-     const photo = Array.from({length: COUNT_PHOTO}, addPhoto);
-     return photo;
-  };
+const AvatarId = {
+  MIN: 1,
+  MAX: 6,
+};
 
-getPhoto();
+const getComment = (_, id) => ({
+  id,
+  avatar: `img/avatar-${getRandomNumberFromInterval(
+    AvatarId.MIN,
+    AvatarId.MAX
+  )}.svg`,
+  message: shuffle(MESSAGES).slice(0, getRandomNumberFromInterval(MessagesCount.MIN,
+    MessagesCount.MAX)),
+  name: NAMES[getRandomNumberFromInterval(0, NAMES.length - 1)],
+});
+
+const getPhotoData = (_, id) => ({
+  id,
+  url: `photos/${id}.jpg`,
+  likes: `img/avatar-${getRandomNumberFromInterval(
+    LikesCount.MIN,
+    LikesCount.MAX
+  )}.svg`,
+  message: shuffle(MESSAGES).slice(0, getRandomNumberFromInterval(MessagesCount.MIN,
+    MessagesCount.MAX)),
+  description: DESCRIPTIONS[getRandomNumberFromInterval(0, DESCRIPTIONS.length - 1)],
+  comments: Array.from({length: getRandomNumberFromInterval(
+    CommentsCount.MIN,
+    CommentsCount.MAX
+  )}, {getComment}),
+});
+
+import {COUNT_PHOTOS} from './consts.js';
+export const getPhotos = (countPhotos) => Array.from({length: countPhotos}, getPhotoData);
+
+getPhotos(COUNT_PHOTOS);
