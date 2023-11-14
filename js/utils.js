@@ -1,4 +1,43 @@
-export const getRandomNumberFromInterval = (start, end) =>
-  Math.ceil(Math.random() * (end - start + 1)) + (start - 1);
+import {COUNT_PHOTOS, MESSAGES_EXAMPLES, DESCRIPTIONS_EXAMPLES, NAMES_EXAMPLES} from "./consts.js";
 
-export const shuffle = (array) => array.sort(() => Math.random() - 0.5);
+const photos = [];
+
+const getRandomInt = (a, b) => {
+  const lower = Math.ceil(Math.min(a, b));
+  const upper = Math.floor(Math.max(a, b));
+  const result = Math.random() * (upper - lower + 1) + lower;
+  return Math.floor(result);
+};
+
+const getRandomArrayElement = (elements) => elements[getRandomInt(0, elements.length - 1)];
+
+const generateComments = () =>{
+  const comments = [];
+  const numComments = getRandomInt(0,30);
+  for (let i=0; i <= numComments - 1; i++){
+    const comment = {
+      id: i,
+      avatar: `img/avatar-${getRandomInt(1, 6)}.svg`,
+      message: getRandomArrayElement(MESSAGES_EXAMPLES),
+      name: getRandomArrayElement(NAMES_EXAMPLES)
+    };
+
+    comments.push(comment);
+  }
+  return comments;
+}
+
+export const getPhotoArray = () =>{
+  for (let i = 1; i <= COUNT_PHOTOS; i++) {
+    const photo = {
+        id: i,
+        url: `photos/${i}.jpg`,
+        description: `Description of Photo ${i}`,
+        likes: getRandomInt(15, 200),
+        comments: generateComments()
+    };
+    photos.push(photo);
+  }
+  console.log(photos)
+  return photos;
+}
