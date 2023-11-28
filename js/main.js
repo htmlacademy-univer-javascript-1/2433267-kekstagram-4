@@ -1,4 +1,3 @@
-import { randomPosts } from "./drawMiniatures.js";
+import {getMiniPhotos} from './drawMiniatures.js'
 
-
-randomPosts;
+getMiniPhotos();

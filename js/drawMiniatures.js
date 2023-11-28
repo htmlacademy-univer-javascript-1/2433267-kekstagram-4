@@ -1,5 +1,7 @@
 import { getPhotoArray } from "./utils.js";
+import { openPhoto } from "./bigPhoto.js";
 
+export const getMiniPhotos = () => {
 const pictureTemplate = document
   .querySelector("#picture")
   .content.querySelector(".picture");
@@ -14,11 +16,10 @@ randomPosts.forEach(({ url, description, likes, comments }) => {
   picture.querySelector(".picture__likes").textContent = likes;
   picture.querySelector(".picture__comments").textContent = comments.length;
   picture.addEventListener("click", (evt) => {
-    openPicture(evt, url, description, likes, comments);
+    openPhoto(evt, url, description, likes, comments);
   });
   picturesFragment.append(picture);
 });
 
 picturesContainer.append(picturesFragment);
-
-export { randomPosts };
+}
