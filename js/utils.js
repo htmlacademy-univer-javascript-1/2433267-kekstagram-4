@@ -38,6 +38,5 @@ export const getPhotoArray = () =>{
     };
     photos.push(photo);
   }
-  console.log(photos)
   return photos;
 }

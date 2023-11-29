@@ -16,6 +16,7 @@ randomPosts.forEach(({ url, description, likes, comments }) => {
   picture.querySelector(".picture__likes").textContent = likes;
   picture.querySelector(".picture__comments").textContent = comments.length;
   picture.addEventListener("click", (evt) => {
+    console.log(comments)
     openPhoto(evt, url, description, likes, comments);
   });
   picturesFragment.append(picture);
