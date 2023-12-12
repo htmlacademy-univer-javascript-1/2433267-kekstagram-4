@@ -1,4 +1,4 @@
-import {COUNT_PHOTOS, MESSAGES_EXAMPLES, DESCRIPTIONS_EXAMPLES, NAMES_EXAMPLES} from "./consts.js";
+import {COUNT_PHOTOS, MESSAGES_EXAMPLES, NAMES_EXAMPLES} from './consts.js';
 
 const photos = [];
 
@@ -25,18 +25,24 @@ const generateComments = () =>{
     comments.push(comment);
   }
   return comments;
-}
+};
 
 export const getPhotoArray = () =>{
   for (let i = 1; i <= COUNT_PHOTOS; i++) {
     const photo = {
-        id: i,
-        url: `photos/${i}.jpg`,
-        description: `Description of Photo ${i}`,
-        likes: getRandomInt(15, 200),
-        comments: generateComments()
+      id: i,
+      url: `photos/${i}.jpg`,
+      description: `Description of Photo ${i}`,
+      likes: getRandomInt(15, 200),
+      comments: generateComments()
     };
     photos.push(photo);
   }
   return photos;
-}
+};
+
+export const onDocumentKeydown = (evt, closeFunc) => {
+  if (evt.key === 'Escape') {
+    closeFunc(evt);
+  }
+};

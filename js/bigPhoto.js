@@ -1,15 +1,8 @@
+import { onDocumentKeydown } from './utils.js';
+
 const comTemplate = document.querySelector('.social__comment');
 
-const downloadElse = document.querySelector('.social__comments-loader');
-
 const comLoader = document.querySelector('.comments-loader');
-
-
-const onDocumentKeydown = (evt) => {
-  if (evt.key === 'Escape') {
-    closePhoto(evt);
-  }
-};
 
 const showMore = () => {
   let currentComment = document.querySelector('.social__comment.hidden');
@@ -17,7 +10,7 @@ const showMore = () => {
 
   for (; i < 5; i++) {
     if (currentComment === null) {
-      commentsLoader.classList.add('hidden');
+      comLoader.classList.add('hidden');
       break;
     }
     currentComment.classList.remove('hidden');
@@ -57,14 +50,14 @@ function openPhoto(evt, url, description, likes, comments) {
   openedPicture.querySelector('.social__caption').textContent = description;
   openedPicture.querySelector('.active__comments-count').textContent = '0';
 
-  const commentsContainer = document.querySelector('.social__comments');
-  loadAllCom(commentsContainer, comments);
+  const comContainer = document.querySelector('.social__comments');
+  loadAllCom(comContainer, comments);
   showMore();
 
   document.body.classList.add('modal-open');
 
   openedPicture.querySelector('.big-picture__cancel').addEventListener('click', closePhoto);
-  document.addEventListener('keydown', onDocumentKeydown);
+  document.addEventListener('keydown', onDocumentKeydown(closePhoto));
   openedPicture.querySelector('.social__comments-loader').addEventListener('click', showMore);
 }
 
@@ -72,7 +65,7 @@ function closePhoto(evt) {
   document.body.classList.remove('modal-open');
   document.querySelector('.big-picture').classList.add('hidden');
   evt.target.removeEventListener('click', closePhoto);
-  document.removeEventListener('keydown', onDocumentKeydown);
+  document.removeEventListener('keydown', onDocumentKeydown(closePhoto));
   document
     .querySelector('.social__comments-loader')
     .removeEventListener('click', showMore);
