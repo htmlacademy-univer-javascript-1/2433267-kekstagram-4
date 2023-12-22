@@ -3,14 +3,14 @@ const convertTimeToMinutes = (time) => {
   return hours * 60 + minutes;
 };
 
-  const checkworkingSchedule = (dayStart, dayEnd, meetingStart, meetingDuration) => {
-    dayStart = convertTimeToMinutes (dayStart);
-    dayEnd = convertTimeToMinutes (dayEnd);
-    meetingStart = convertTimeToMinutes(meetingStart);
+const checkworkingSchedule = (dayStart, dayEnd, meetingStart, meetingDuration) => {
+  dayStart = convertTimeToMinutes (dayStart);
+  dayEnd = convertTimeToMinutes (dayEnd);
+  meetingStart = convertTimeToMinutes(meetingStart);
 
-    if (meetingStart >= dayStart) {
-      return (meetingStart + meetingDuration) <= dayEnd;
-    }
+  if (meetingStart >= dayStart) {
+    return (meetingStart + meetingDuration) <= dayEnd;
+  }
 
-      return false;
-  };
+  return false;
+};
