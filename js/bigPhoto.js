@@ -1,4 +1,4 @@
-import { onDocumentKeydown } from './utils.js';
+import { closeModal } from './utils.js';
 
 const comTemplate = document.querySelector('.social__comment');
 
@@ -26,6 +26,10 @@ const showMore = () => {
     +document.querySelector('.active__comments-count').textContent + i;
 };
 
+const onDocumentKeydown = (evt) =>{
+  closeModal(evt, closePhoto);
+};
+
 const loadAllCom = (commentsContainer, comments) => {
   const commentsFragment = document.createDocumentFragment();
   for (let i = 0; i < comments.length; ++i) {
@@ -40,24 +44,24 @@ const loadAllCom = (commentsContainer, comments) => {
   commentsContainer.append(commentsFragment);
 };
 
-function openPhoto(evt, url, description, likes, comments) {
+function openPhoto(photo) {
   const openedPicture = document.querySelector('.big-picture');
   comLoader.classList.remove('hidden');
   openedPicture.classList.remove('hidden');
-  openedPicture.querySelector('.big-picture__img img').src = url;
-  openedPicture.querySelector('.likes-count').textContent = likes;
-  openedPicture.querySelector('.comments-count').textContent = comments.length;
-  openedPicture.querySelector('.social__caption').textContent = description;
+  openedPicture.querySelector('.big-picture__img img').src = photo.url;
+  openedPicture.querySelector('.likes-count').textContent = photo.likes;
+  openedPicture.querySelector('.comments-count').textContent = photo.comments.length;
+  openedPicture.querySelector('.social__caption').textContent = photo.description;
   openedPicture.querySelector('.active__comments-count').textContent = '0';
 
   const comContainer = document.querySelector('.social__comments');
-  loadAllCom(comContainer, comments);
+  loadAllCom(comContainer, photo.comments);
   showMore();
 
   document.body.classList.add('modal-open');
 
   openedPicture.querySelector('.big-picture__cancel').addEventListener('click', closePhoto);
-  document.addEventListener('keydown', onDocumentKeydown(closePhoto));
+  document.addEventListener('keydown', onDocumentKeydown);
   openedPicture.querySelector('.social__comments-loader').addEventListener('click', showMore);
 }
 
@@ -65,7 +69,7 @@ function closePhoto(evt) {
   document.body.classList.remove('modal-open');
   document.querySelector('.big-picture').classList.add('hidden');
   evt.target.removeEventListener('click', closePhoto);
-  document.removeEventListener('keydown', onDocumentKeydown(closePhoto));
+  document.removeEventListener('keydown', onDocumentKeydown);
   document
     .querySelector('.social__comments-loader')
     .removeEventListener('click', showMore);
