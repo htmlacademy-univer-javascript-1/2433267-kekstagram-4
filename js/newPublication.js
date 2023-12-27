@@ -1,4 +1,4 @@
-import { onDocumentKeydown } from './utils.js';
+import { closeModal } from './utils.js';
 import { MAX_HASHTAGS_COUNT, MAX_DESCRIPTION_LENGTH } from './consts.js';
 import {resetEffect, initEffect} from './effects.js';
 import {resetScale} from './scale.js';
@@ -13,6 +13,9 @@ const submitBtn = uploadForm.querySelector('#upload-submit');
 
 const validationForm = /^#[0-9a-zа-яё]{1,19}$/i;
 
+const onDocumentKeyDown = (evt) =>{
+  closeModal(evt, closeOverlay);
+};
 const pristine = new Pristine(uploadForm, {
   classTo: 'img-upload__field-wrapper',
   errorClass: 'img-upload--invalid',
@@ -76,17 +79,22 @@ pristine.addValidator(
   'Максимальная длина описания: 140'
 );
 
-function closeOverlay(){
+export function closeOverlay(){
+  if(document.querySelector('.error')){
+    return;
+  }
   imageOverlay.classList.add('hidden');
   resetEffect();
   resetScale();
+  uploadForm.reset();
+  pristine.reset();
   document.body.classList.remove('modal-open');
   closeBtn.removeEventListener('click', closeOverlay);
-  document.removeEventListener('keydown', onDocumentKeydown(closeOverlay));
-  uploadInput.addEventListener('click', openOverlay);
+  document.removeEventListener('keydown', onDocumentKeyDown);
   uploadInput.value = null;
   hashtagsField.textContent = '';
   descriptionField.textContent = '';
+  submitBtn.removeAttribute('disabled');
 }
 
 function openOverlay() {
@@ -94,8 +102,7 @@ function openOverlay() {
   imageOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
   closeBtn.addEventListener('click', closeOverlay);
-  document.addEventListener('keydown', onDocumentKeydown(closeOverlay));
-  uploadInput.removeEventListener('click', openOverlay);
+  document.addEventListener('keydown', onDocumentKeyDown);
 }
 
 uploadInput.addEventListener('change', openOverlay);
