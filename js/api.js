@@ -1,6 +1,6 @@
 const urls = {
   GET: 'https://29.javascript.pages.academy/kekstagram/data',
-  POST: 'https://29.javascript.pages.academy/kekstagram',
+  POST: 'https://29.javascript.pages.academy/kekstagra',
 };
 
 const sendRequest = (onSuccess, onFail, method, body) =>{
@@ -15,13 +15,11 @@ const sendRequest = (onSuccess, onFail, method, body) =>{
     .then((data) => {
       onSuccess(data);
     })
-    .catch((err) => {
-      onFail(err);
+    .catch(() => {
+      onFail();
     });
 };
 
-const loadData = (onSuccess, onFail, method = 'GET') => sendRequest(onSuccess, onFail, method);
+export const loadData = (onSuccess, onFail, method = 'GET') => sendRequest(onSuccess, onFail, method);
 
-const uploadData = (onSuccess, onFail, method = 'POST', body) => sendRequest(onSuccess, onFail, method, body);
-
-export{loadData, uploadData};
+export const uploadData = (onSuccess, onFail, method = 'POST', body) => sendRequest(onSuccess, onFail, method, body);
