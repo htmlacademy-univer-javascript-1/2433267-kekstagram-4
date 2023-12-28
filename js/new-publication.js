@@ -1,7 +1,9 @@
-import { closeModal } from './utils.js';
-import { MAX_HASHTAGS_COUNT, MAX_DESCRIPTION_LENGTH } from './consts.js';
+import { MAX_HASHTAGS_COUNT, MAX_DESCRIPTION_LENGTH, FILE_TYPES } from './consts.js';
 import {resetEffect, initEffect} from './effects.js';
 import {resetScale} from './scale.js';
+import { isEscKey } from './utils.js';
+import { onSuccess, onFail } from './submit.js';
+import { uploadData } from './api.js';
 
 const uploadForm = document.querySelector('.img-upload__form');
 const uploadInput = uploadForm.querySelector('.img-upload__input');
@@ -10,12 +12,11 @@ const closeBtn = uploadForm.querySelector('.img-upload__cancel');
 const hashtagsField = uploadForm.querySelector('.text__hashtags');
 const descriptionField = uploadForm.querySelector('.text__description');
 const submitBtn = uploadForm.querySelector('#upload-submit');
+const userImage = uploadForm.querySelector('.img-upload__preview img');
+const effects = uploadForm.querySelectorAll('.effects__preview');
 
 const validationForm = /^#[0-9a-zа-яё]{1,19}$/i;
 
-const onDocumentKeyDown = (evt) =>{
-  closeModal(evt, closeOverlay);
-};
 const pristine = new Pristine(uploadForm, {
   classTo: 'img-upload__field-wrapper',
   errorClass: 'img-upload--invalid',
@@ -25,10 +26,33 @@ const pristine = new Pristine(uploadForm, {
   errorTextClass: 'img-upload__error'
 });
 
-const validateHashtagsCount = (value) => value.trim().split(' ').length <= MAX_HASHTAGS_COUNT;
+export const onDocumentKeydown = (evt) =>{
+  if(isEscKey(evt) &&
+  !document.body.querySelector('.error') &&
+  !evt.target.classList.contains('text__hashtags') &&
+  !evt.target.classList.contains('text__description')){
+    evt.preventDefault();
+    closeOverlay();
+  }
+};
 
-const validateHashtagsUniq = (value) => {
-  const hashtags = value.split(' ');
+const validateHashtagsCount = (value) => value.trim().split(/\s+/).length <= MAX_HASHTAGS_COUNT;
+
+const validHashtags = (value) => {
+  if (value.length === 0) {
+    return true;
+  }
+  const hashtags = value.trim().split(/\s+/);
+  for (let i = 0; i < hashtags.length; ++i) {
+    if (!validationForm.test(hashtags[i])) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const validateHashtagsUniqueness = (value) => {
+  const hashtags = value.trim().split(/\s+/);
   const hashTagMap = {};
   for (let i = 0; i < hashtags.length; i++) {
     const hashtag = hashtags[i];
@@ -40,35 +64,22 @@ const validateHashtagsUniq = (value) => {
   return true;
 };
 
-const validHashtages = (value) => {
-  if (value.length === 0) {
-    return true;
-  }
-  const hashtags = value.trim().split(' ');
-  for (let i = 0; i < hashtags.length; ++i) {
-    if (!validationForm.test(hashtags[i])) {
-      return false;
-    }
-  }
-  return true;
-};
-
 pristine.addValidator(
   hashtagsField,
   validateHashtagsCount,
-  'Максимальное количество хэштегов: 5'
+  'Максимальное кол-во хэштегов: 5'
 );
 
 pristine.addValidator(
   hashtagsField,
-  validateHashtagsUniq,
-  'Удалите повторяющиеся хэштеги'
+  validateHashtagsUniqueness,
+  'Не должно быть повторяющихся хэштегов'
 );
 
 pristine.addValidator(
   hashtagsField,
-  validHashtages,
-  'Ошибка в хештеге'
+  validHashtags,
+  'Ошибка хештега'
 );
 
 const validateDescription = (value) => value.trim().length <= MAX_DESCRIPTION_LENGTH;
@@ -76,22 +87,19 @@ const validateDescription = (value) => value.trim().length <= MAX_DESCRIPTION_LE
 pristine.addValidator(
   descriptionField,
   validateDescription,
-  'Максимальная длина описания: 140'
+  'Описание не может быть больше 140 символов'
 );
 
 export function closeOverlay(){
-  if(document.querySelector('.error')){
-    return;
-  }
   imageOverlay.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+  closeBtn.removeEventListener('click', closeOverlay);
+  document.removeEventListener('keydown', onDocumentKeydown);
+  uploadInput.value = null;
+  pristine.reset();
   resetEffect();
   resetScale();
   uploadForm.reset();
-  pristine.reset();
-  document.body.classList.remove('modal-open');
-  closeBtn.removeEventListener('click', closeOverlay);
-  document.removeEventListener('keydown', onDocumentKeyDown);
-  uploadInput.value = null;
   hashtagsField.textContent = '';
   descriptionField.textContent = '';
   submitBtn.removeAttribute('disabled');
@@ -102,7 +110,19 @@ function openOverlay() {
   imageOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
   closeBtn.addEventListener('click', closeOverlay);
-  document.addEventListener('keydown', onDocumentKeyDown);
+
+  document.addEventListener('keydown', onDocumentKeydown);
+
+  const file = uploadInput.files[0];
+  const fileName = file.name.toLowerCase();
+
+  if(FILE_TYPES.some((it) => fileName.endsWith(it))){
+    userImage.src = URL.createObjectURL(file);
+
+    effects.forEach((effect) => {
+      effect.style.backgroundImage = `url('${userImage.src}')`;
+    });
+  }
 }
 
 uploadInput.addEventListener('change', openOverlay);
@@ -127,4 +147,10 @@ descriptionField.addEventListener('input', (evt) => {
   else{
     submitBtn.removeAttribute('disabled');
   }
+});
+
+uploadForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  const formData = new FormData(evt.target);
+  uploadData(onSuccess, onFail, 'POST', formData);
 });

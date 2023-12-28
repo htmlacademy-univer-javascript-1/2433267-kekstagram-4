@@ -73,7 +73,7 @@ const setImageStyle = () => {
   imageElement.style.filter = `${style}(${value}${unit})`;
 };
 
-const onSliderUpd = () => {
+const onSliderUpdate = () => {
   effectLevelElement.value = sliderElement.noUiSlider.get();
   setImageStyle();
 };
@@ -93,11 +93,11 @@ const createSlider = ({ min, max, step }) => {
       from: (value) => Number(value),
     }
   });
-  sliderElement.noUiSlider.on('update', onSliderUpd);
+  sliderElement.noUiSlider.on('update', onSliderUpdate);
   hideSlider();
 };
 
-const updSlider = ({ min, max, step }) => {
+const updateSlider = ({ min, max, step }) => {
   sliderElement.noUiSlider.updateOptions({
     range: {min, max},
     step,
@@ -109,7 +109,7 @@ const setSlider = () => {
   if (isDefault()) {
     hideSlider();
   } else {
-    updSlider(effectToSliderOptions[chosenEffect]);
+    updateSlider(effectToSliderOptions[chosenEffect]);
     showSlider();
   }
 };

@@ -1,4 +1,4 @@
-import { closeModal } from './utils.js';
+import { onDocumentKeydown } from './utils.js';
 
 const comTemplate = document.querySelector('.social__comment');
 
@@ -6,9 +6,9 @@ const comLoader = document.querySelector('.comments-loader');
 
 const showMore = () => {
   let currentComment = document.querySelector('.social__comment.hidden');
-  let i = 0;
+  let currentCommentQuantity = 0;
 
-  for (; i < 5; i++) {
+  for (; currentCommentQuantity < 5; currentCommentQuantity++) {
     if (currentComment === null) {
       comLoader.classList.add('hidden');
       break;
@@ -23,11 +23,7 @@ const showMore = () => {
     }
   }
   document.querySelector('.active__comments-count').textContent =
-    +document.querySelector('.active__comments-count').textContent + i;
-};
-
-const onDocumentKeydown = (evt) =>{
-  closeModal(evt, closePhoto);
+    +document.querySelector('.active__comments-count').textContent + currentCommentQuantity;
 };
 
 const loadAllCom = (commentsContainer, comments) => {
@@ -44,24 +40,24 @@ const loadAllCom = (commentsContainer, comments) => {
   commentsContainer.append(commentsFragment);
 };
 
-function openPhoto(photo) {
+function openPhoto(evt, url, description, likes, comments) {
   const openedPicture = document.querySelector('.big-picture');
   comLoader.classList.remove('hidden');
   openedPicture.classList.remove('hidden');
-  openedPicture.querySelector('.big-picture__img img').src = photo.url;
-  openedPicture.querySelector('.likes-count').textContent = photo.likes;
-  openedPicture.querySelector('.comments-count').textContent = photo.comments.length;
-  openedPicture.querySelector('.social__caption').textContent = photo.description;
+  openedPicture.querySelector('.big-picture__img img').src = url;
+  openedPicture.querySelector('.likes-count').textContent = likes;
+  openedPicture.querySelector('.comments-count').textContent = comments.length;
+  openedPicture.querySelector('.social__caption').textContent = description;
   openedPicture.querySelector('.active__comments-count').textContent = '0';
 
   const comContainer = document.querySelector('.social__comments');
-  loadAllCom(comContainer, photo.comments);
+  loadAllCom(comContainer, comments);
   showMore();
 
   document.body.classList.add('modal-open');
 
   openedPicture.querySelector('.big-picture__cancel').addEventListener('click', closePhoto);
-  document.addEventListener('keydown', onDocumentKeydown);
+  document.addEventListener('keydown', onDocumentKeydown(closePhoto));
   openedPicture.querySelector('.social__comments-loader').addEventListener('click', showMore);
 }
 
@@ -69,7 +65,7 @@ function closePhoto(evt) {
   document.body.classList.remove('modal-open');
   document.querySelector('.big-picture').classList.add('hidden');
   evt.target.removeEventListener('click', closePhoto);
-  document.removeEventListener('keydown', onDocumentKeydown);
+  document.removeEventListener('keydown', onDocumentKeydown(closePhoto));
   document
     .querySelector('.social__comments-loader')
     .removeEventListener('click', showMore);
